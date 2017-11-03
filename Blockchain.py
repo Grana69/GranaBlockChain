@@ -8,6 +8,8 @@ class Block:
 		return self.bh
 	def Calcular(self):
 		self.bh = self.cSha256(str([self.cSha256(self.ts),self.ph]))
+	def vCalcular(self):
+		return self.cSha256(str([self.cSha256(self.ts),self.ph]))
 	def getPh(self):
 		return self.ph
 	def getTs(self):
@@ -18,7 +20,6 @@ class Block:
 		return hash(cadena);
 	def cSha256(self,cadena):
 		return hashlib.sha256(cadena).hexdigest()
-
 
 class CadenaDeBloques:
 	def __init__(self):
@@ -33,6 +34,13 @@ class CadenaDeBloques:
 		bloque.ph = self.getUltimoBloque().bh
 		bloque.Calcular()
 		self.cadena.append(bloque)
+	def validarCadena(self):
+		for i in range(1, len(self.cadena)):
+			if self.cadena[i].getBh() != self.cadena[i].vCalcular():
+				return False
+			if self.cadena[i].getPh() != self.cadena[i-1].getBh():
+				return False
+		return True
 	def imprimirCadena(self):
 		print "\nCadena de bloques:\n"
 		for item in self.cadena:
@@ -40,8 +48,10 @@ class CadenaDeBloques:
 			print "Hash: %s" % item.bh
 			print "Hash Anterior: %s\n \n " % item.ph
 
-
 bs = CadenaDeBloques()
 bs.setNuevoBloque(Block(0,"Enviar 11 objetos"))
 bs.setNuevoBloque(Block(1,"Enviar 13 objetos"))
 bs.imprimirCadena()
+print bs.validarCadena()
+bs.cadena[1].ts = "Enviar 12 objetos"
+print bs.validarCadena()
